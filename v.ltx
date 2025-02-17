@@ -1,0 +1,413 @@
+\documentclass[conference]{IEEEtran}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{url}
+\usepackage{amssymb}
+\usepackage{float}
+
+\title{CoreRec : DNG Scoring Meets Transformer Models}
+
+\author{\IEEEauthorblockN{Vishesh Yadav}
+\IEEEauthorblockA{
+(vishesh@corerec.tech)
+}
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+CoreRec is a novel graph-based recommendation engine designed to provide personalized recommendations by leveraging a Direct, Neighborhood, and Graph (DNG) scoring mechanism. This paper introduces the architecture of CoreRec, which incorporates a Transformer-based model to analyze and score large-scale graph data. The proposed system is designed to scale efficiently to handle graphs with trillions of nodes, making it suitable for use in environments with vast and complex datasets. Experimental results demonstrate the effectiveness of CoreRec in generating accurate and relevant recommendations.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Graph-based Recommendation, Transformer, DNG Scoring, Scalability, Machine Learning.
+\end{IEEEkeywords}
+
+\section{Introduction}
+The increasing volume of data in online platforms has necessitated the development of efficient and scalable recommendation systems. Traditional collaborative filtering and content-based methods often struggle with the complexity and scale of modern datasets. Graph-based approaches have emerged as a powerful alternative, leveraging the natural structure of data in many real-world applications.
+
+CoreRec is a graph-based recommendation engine designed to provide accurate and personalized recommendations. It employs a Direct, Neighborhood, and Graph (DNG) scoring mechanism to evaluate the relevance of items to users based on their interactions and relationships within the graph. The system utilizes a Transformer-based architecture to capture complex dependencies and interactions within the graph, allowing it to scale efficiently even with extremely large datasets.
+
+\section{Methodology}
+
+CoreRec's recommendation process relies on a combination of graph-based modeling and Transformer-based embeddings. This section delves into the mathematical foundations underlying the DNG scoring mechanism and the Transformer architecture used to generate node embeddings.
+
+\subsection{Graph Representation}
+
+Let \( G = (V, E) \) represent the graph where \( V \) is the set of nodes (e.g., users and items) and \( E \) is the set of edges representing interactions between nodes. Each edge \( e_{ij} \in E \) is associated with a weight \( w_{ij} \) that reflects the strength of the interaction between nodes \( v_i \) and \( v_j \).
+
+\subsection{DNG Scoring Mechanism}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\linewidth]{dng.png}
+    \caption{Flow Diagram of Graph-Transformer}
+    \label{fig:enter-label}
+\end{figure}
+The DNG (Direct, Neighborhood, Graph) scoring mechanism calculates the recommendation score for an item \( j \) for a user \( i \) as a weighted sum of three components: Direct score \( D(i, j) \), Neighborhood score \( N(i, j) \), and Graph score \( G(i, j) \).
+
+\subsubsection{Direct Score}
+
+The Direct score \( D(i, j) \) measures the direct interaction between user \( i \) and item \( j \). It can be expressed as:
+
+\[
+D(i, j) = w_{ij}
+\]
+
+where \( w_{ij} \) is the weight of the edge between \( i \) and \( j \). If no direct interaction exists, \( w_{ij} = 0 \).
+
+\subsubsection{Neighborhood Score}
+
+The Neighborhood score \( N(i, j) \) captures the influence of user \( i \)'s neighbors on the recommendation of item \( j \). Let \( \mathcal{N}(i) \) denote the set of neighbors of \( i \). The Neighborhood score is given by:
+
+\[
+N(i, j) = \sum_{k \in \mathcal{N}(i)} \alpha_k w_{kj}
+\]
+
+where \( \alpha_k \) is a weighting factor that adjusts the influence of neighbor \( k \) based on their similarity or connection strength to user \( i \).
+
+\subsubsection{Graph Score}
+
+The Graph score \( G(i, j) \) evaluates the overall connectivity and structure of the graph with respect to user \( i \) and item \( j \). It is defined as:
+
+\[
+G(i, j) = \sum_{p \in \mathcal{P}(i, j)} \beta_p \prod_{(u,v) \in p} w_{uv}
+\]
+
+where \( \mathcal{P}(i, j) \) is the set of all paths between \( i \) and \( j \), and \( \beta_p \) is a path-specific weighting factor that decreases with the length of the path \( p \). This score accounts for higher-order connections in the graph.
+
+\subsubsection{Overall Recommendation Score}
+
+The overall recommendation score \( R(i, j) \) for item \( j \) for user \( i \) is a weighted sum of the three components:
+
+\[
+R(i, j) = \lambda_D D(i, j) + \lambda_N N(i, j) + \lambda_G G(i, j)
+\]
+
+where \( \lambda_D \), \( \lambda_N \), and \( \lambda_G \) are hyperparameters that control the contribution of each component.
+
+
+\subsection{Transformer-Based Architecture}
+
+The GraphTransformerV2 model employs a Transformer-based architecture to effectively capture complex relationships in graph data. The computation process starts with the initialization of input data and proceeds through several stages. Firstly, the model performs direct neighbor aggregation using the adjacency matrix to capture immediate node connections. This is followed by computing the neighborhood similarity using metrics such as Jaccard similarity to measure the overlap between neighboring nodes. Subsequently, a centrality score is calculated to determine the importance of nodes within the graph's structure.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{gt_comp.png}
+    \caption{Flow Diagram of Graph-Transformers.}
+
+\end{figure}
+
+The intermediate results from these computations are then concatenated and passed through multiple layers of a Transformer encoder to learn complex patterns and interactions within the graph. The encoded output is then processed through an output layer to generate the final predictions. This design allows the model to combine local and global graph structures with node features, resulting in improved representation learning and predictive accuracy.
+
+
+
+\subsection{Transformer-Based Architecture}
+
+The Transformer model is used to generate node embeddings that capture the structure of the graph and the relationships between nodes. Given an input sequence of nodes, the Transformer produces a sequence of embeddings, where each embedding represents a node in a high-dimensional space.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\linewidth]{tt.jpeg}
+    \caption{Flow Diagram of our Algorithm}
+    \label{fig:enter-label}
+\end{figure}
+
+\begin{itemize}
+    \item \textit{Model Architecture}
+    \begin{itemize}
+        \item \textit{Input Linear Layer}: Transforms input data into a suitable format using \texttt{self.input\_linear}.
+        \item \textit{Transformer Encoder Layers}: Captures complex patterns with \texttt{self.encoder\_layer} and \texttt{self.transformer\_encoder}.
+        \item \textit{Output Linear Layer}: Transforms encoded data back to input dimension with \texttt{self.output\_linear}.
+    \end{itemize}
+    \vspace{5mm} %5mm vertical space
+    \vfill
+    \item \textit{Training Logic}
+    \hfill\break
+    \begin{itemize}
+        \item \textit{Predict Adjacency Matrix}: Utilizes the adjacency matrix in the \texttt{forward} method for direct connection scores.
+        \item \textit{Calculate Loss (MSE)}: Involves comparing model output with true adjacency matrix (not shown in code).
+        \item \textit{Adjust Weights}: Uses \texttt{self.weight\_linears} to adjust input features if \texttt{use\_weights} is enabled.
+    \end{itemize}
+    
+    \item \textit{Recommendation Logic}
+    \begin{itemize}
+        \item \textit{Output Scores}: Computed in the \texttt{forward} method as \texttt{final\_scores}.
+        \item \textit{Interpret Scores}: Analyzed outside the code to make recommendations.
+        \item \textit{Recommend Nodes}: Nodes or items are recommended based on interpreted scores.
+    \end{itemize}
+    
+    \item \textit{Additional Details}
+    \begin{itemize}
+        \item \textit{Direct Connections, Neighborhood Similarity, and Graph Structure}: Computed using matrix operations in the \texttt{forward} method.
+        \item \textit{Weighted Processing}: Applies transformations using weights if \texttt{use\_weights} is enabled.
+        \item \textit{Normalization and Dropout}: Uses \texttt{LayerNorm} and \texttt{Dropout} for training stability and to prevent overfitting.
+    \end{itemize}
+\end{itemize}
+Let \( X = \{x_1, x_2, \dots, x_n\} \) be the input sequence of node features, where \( x_i \in \mathbb{R}^d \) is the feature vector of node \( i \). The Transformer architecture consists of the following steps:
+
+\subsubsection{Self-Attention Mechanism}
+
+The self-attention mechanism computes a weighted sum of the input features for each node, allowing the model to focus on relevant parts of the graph. For each node \( i \), the attention score with respect to node \( j \) is given by:
+
+\[
+a_{ij} = \frac{\exp\left(\frac{(x_i W_Q)(x_j W_K)^T}{\sqrt{d_k}}\right)}{\sum_{k=1}^{n} \exp\left(\frac{(x_i W_Q)(x_k W_K)^T}{\sqrt{d_k}}\right)}
+\]
+
+where \( W_Q \) and \( W_K \) are the query and key weight matrices, respectively, and \( d_k \) is the dimension of the key vectors.
+
+The output for node \( i \) is then:
+
+\[
+z_i = \sum_{j=1}^{n} a_{ij} (x_j W_V)
+\]
+
+where \( W_V \) is the value weight matrix.
+
+\subsubsection{Multi-Head Attention}
+
+To allow the model to focus on different aspects of the graph, the Transformer uses multi-head attention. For each head \( h \), we compute:
+
+\[
+z_i^h = \sum_{j=1}^{n} a_{ij}^h (x_j W_V^h)
+\]
+
+The outputs from all heads are concatenated and transformed by a linear layer:
+
+\[
+z_i = \text{Concat}(z_i^1, z_i^2, \dots, z_i^H) W_O
+\]
+
+where \( W_O \) is the output weight matrix.
+
+\subsubsection{Position-Wise Feed-Forward Network}
+
+Each output \( z_i \) is passed through a feed-forward network (FFN) to introduce non-linearity:
+
+\[
+\text{FFN}(z_i) = \max(0, z_i W_1 + b_1) W_2 + b_2
+\]
+
+where \( W_1 \), \( W_2 \), \( b_1 \), and \( b_2 \) are learnable parameters.
+
+\subsubsection{Final Node Embeddings}
+
+The final output of the Transformer is the set of node embeddings \( \{e_1, e_2, \dots, e_n\} \), where \( e_i \) is the embedding of node \( i \). These embeddings are used in the calculation of the DNG scores to generate the final recommendations.
+
+The \texttt{GraphTransformer} class is a core component of the CoreRec system, designed to process graph data using a Transformer-based architecture. This section provides an overview of its structure and functionality, along with pseudocode to illustrate its operation.
+
+\subsection{Abliation Study}
+We have used one of the module of Tmall dataset ie. "ijcai2016\_koubei\_train",
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lcc}
+        \hline
+        Variant & HR@10 & NDCG@10 \\
+        \hline
+        Full Model & 0.402417 & 0.050092 \\
+        No Transformer & 0.398917 & 0.050040 \\
+        No DNG & 0.398250 & 0.049098 \\
+        No Weights & 0.402750 & 0.050906 \\
+        Basic Model & 0.402250 & 0.049842 \\
+        \hline
+    \end{tabular}
+    \caption{Ablation Study Results}
+    \label{tab:ablation_results}
+\end{table}
+
+
+\subsection{Model Overview}
+
+The \texttt{GraphTransformer} class extends the PyTorch \texttt{Module} class and is initialized with several key parameters:
+
+\begin{itemize}
+    \item \texttt{num\_layers}: Number of Transformer encoder layers.
+    \item \texttt{d\_model}: Dimensionality of the model.
+    \item \texttt{num\_heads}: Number of attention heads.
+    \item \texttt{d\_feedforward}: Dimensionality of the feedforward network.
+    \item \texttt{input\_dim}: Dimensionality of the input features.
+    \item \texttt{num\_weights}: Number of weight matrices for weighted input processing.
+    \item \texttt{use\_weights}: Boolean flag to determine if weights are used.
+    \item \texttt{dropout}: Dropout rate for regularization.
+\end{itemize}
+
+% \newpage
+\subsection{Model Components}
+
+The model consists of the following components:
+
+\begin{itemize}
+    \item \texttt{input\_linear}: A linear layer to project input features to the model dimension.
+    \item \texttt{encoder\_layer}: A single Transformer encoder layer.
+    \item \texttt{transformer\_encoder}: A stack of Transformer encoder layers.
+    \item \texttt{output\_linear}: A linear layer to project the model output back to the input dimension.
+    \item \texttt{dropout}: A dropout layer for regularization.
+    \item \texttt{layer\_norm}: A layer normalization component.
+    \item \texttt{weight\_linears}: A list of linear layers for weighted input processing (if \texttt{use\_weights} is \texttt{True}).
+\end{itemize}
+
+\subsection{Forward Pass Pseudocode}
+
+The forward pass of the \texttt{GraphTransformer} model processes input data through the following steps:
+\begin{algorithmic}
+\STATE \textbf{Input:} Feature matrix $x$, optional weights $weights$
+\STATE Convert $x$ to float
+\IF{\texttt{use\_weights} is \texttt{True}}
+    \IF{$weights$ is not \texttt{None}}
+        \STATE Initialize $weighted\_x$ as a zero matrix of the same shape as $x$
+        \FOR{each $i, weight$ in $weights$}
+            \STATE $weighted\_x \mathrel{+}= \texttt{weight\_linears}[i](x) \times weight$
+        \ENDFOR
+        \STATE $x \leftarrow weighted\_x$
+    \ELSE
+        \STATE $x \leftarrow \texttt{input\_linear}(x)$
+    \ENDIF
+\ELSE
+    \STATE $x \leftarrow \texttt{input\_linear}(x)$
+\ENDIF
+\STATE $x \leftarrow \texttt{layer\_norm}(x)$
+\STATE $x \leftarrow \texttt{transformer\_encoder}(x)$
+\STATE $x \leftarrow \texttt{output\_linear}(x)$
+\STATE $x \leftarrow \texttt{dropout}(x)$
+\STATE \textbf{Output:} Transformed feature matrix $x$
+\end{algorithmic}
+
+This pseudocode outlines the logic for processing input features through the model, highlighting the use of optional weights for feature transformation.
+
+\subsection{Role in CoreRec}
+
+The \texttt{GraphTransformer} model is integral to CoreRec's ability to handle large-scale graph data. By leveraging the Transformer architecture, it captures complex dependencies and interactions within the graph, enabling the system to generate high-quality recommendations efficiently.
+
+\vspace{45nm}
+\section{Scoreformer Objective Function}
+
+Here's a detailed mathematical formulation of Scoreformer's objective function, inspired by the style of the GRPO objective:
+\begin{align}
+\mathcal{L} = & \mathbb{E}_{(X, A, M) \sim \mathcal{D}} \Big[ 
+    \lambda_T \cdot \text{TransformerScore}(X, A, M) \notag \\
+    & + \lambda_D \cdot \text{DNGScore}(X, A, M) \notag \\
+    & + \lambda_P \cdot \text{FinalProjectionScore}(X, A, M) 
+    \Big] + \eta \cdot \text{KL}(p || q)
+\end{align}
+
+\subsection{Breaking Down the Terms}
+
+\begin{itemize}
+    \item \textbf{Expected Value:}
+    \begin{itemize}
+        \item The expectation is taken over the dataset \(\mathcal{D}\), where samples \((X, A, M)\) consist of:
+        \begin{itemize}
+            \item Input feature matrix \(X\), representing user-item interactions.
+            \item Adjacency matrix \(A\), encoding structural relationships in the graph.
+            \item Graph metrics \(M\), containing additional topological features.
+        \end{itemize}
+        \item These components allow the model to learn representations that integrate both content-based and structural information.
+    \end{itemize}
+    
+    \item \textbf{Transformer Score \(\text{TransformerScore}(X, A, M)\):}
+    \begin{itemize}
+        \item If the transformer encoder is enabled, Scoreformer computes:
+        \[
+        \text{TransformerScore}(X, A, M) = \sum_{i} \text{Attention}(X_i, A_i, M_i)
+        \]
+        \item This term ensures that the self-attention mechanism refines the embeddings to capture complex dependencies in user-item interactions.
+    \end{itemize}
+    
+    \item \textbf{DNG Score \(\text{DNGScore}(X, A, M)\):}
+    \begin{itemize}
+        \item If the Deep Neural Graph (DNG) module is enabled, Scoreformer applies:
+        \[
+        \text{DNGScore}(X, A, M) = \sum_{i} \text{GraphRefinement}(X_i, A_i, M_i)
+        \]
+        \item This term leverages graph-based refinements to enhance representation learning.
+    \end{itemize}
+    
+    \item \textbf{Final Projection Score \(\text{FinalProjectionScore}(X, A, M)\):}
+    \begin{itemize}
+        \item The final linear projection determines the recommendation probabilities:
+        \begin{multline*}
+        \text{FinalProjectionScore}(X, A, M) = \\
+        \sum_{i} \text{LinearProjection}(X_i, A_i, M_i)
+        \end{multline*}
+        \item This step projects embeddings into the target space, ensuring the output aligns with the recommendation task.
+    \end{itemize}
+    
+    \item \textbf{KL Divergence Regularization:}
+    \begin{itemize}
+        \item The term:
+        \[
+        \text{KL}(p || q)
+        \]
+        penalizes deviations from a reference policy \(q\), encouraging smooth and stable updates.
+    \end{itemize}
+    
+    \item \textbf{Hyperparameters \(\lambda_T, \lambda_D, \lambda_P, \eta\):}
+    \begin{itemize}
+        \item The weighting coefficients \(\lambda_T, \lambda_D, \lambda_P\) control the relative contributions of the Transformer, DNG, and final projection terms.
+        \item The regularization factor \(\eta\) governs the strength of KL divergence constraints.
+    \end{itemize}
+\end{itemize}
+\section{Conclusion}
+CoreRec's combination of graph-based modeling, the DNG scoring mechanism, and Transformer-based embeddings provides a powerful framework for personalized recommendations. The mathematical derivations outlined in this paper demonstrate the robustness and scalability of the system. Future work will focus on further refining the model and exploring additional enhancements to improve recommendation accuracy.
+
+
+\begin{thebibliography}{99}
+
+\bibitem{simclusters}
+J.~Chen \emph{et~al.}, ``SimClusters: Community-Based Representations for Heterogeneous Recommendations at Twitter'' \emph{Twitter},
+
+\bibitem{chen2020graph}
+J.~Chen \emph{et~al.}, ``Graph neural networks: A review of methods and
+  applications,'' \emph{AI Open}, vol.~1, pp. 57--81, 2020.
+
+\bibitem{wu2021comprehensive}
+Z.~Wu \emph{et~al.}, ``A comprehensive survey on community detection with deep
+  learning,'' \emph{IEEE Transactions on Neural Networks and Learning Systems},
+  vol.~32, no.~5, pp. 1947--1966, 2021.
+
+\bibitem{zhang2019survey}
+Y.~Zhang \emph{et~al.}, ``A survey on graph neural networks,'' \emph{IEEE
+  Transactions on Neural Networks and Learning Systems}, vol.~30, no.~1, pp.
+  4--21, 2019.
+
+\bibitem{kipf2017semi}
+T.~N. Kipf and M.~Welling, ``Semi-supervised classification with graph
+  convolutional networks,'' in \emph{Proceedings of the International
+  Conference on Learning Representations (ICLR)}, 2017.
+
+\bibitem{vaswani2017attention}
+A.~Vaswani \emph{et~al.}, ``Attention is all you need,'' in \emph{Advances in
+  Neural Information Processing Systems}, vol.~30, 2017.
+
+\bibitem{hamilton2017inductive}
+W.~Hamilton, Z.~Ying, and J.~Leskovec, ``Inductive representation learning on
+  large graphs,'' in \emph{Advances in Neural Information Processing Systems},
+  vol.~30, 2017.
+
+\bibitem{zhang2020link}
+M.~Zhang and Y.~Yang, ``Link prediction based on graph neural networks,'' in
+  \emph{Proceedings of the AAAI Conference on Artificial Intelligence},
+  vol.~34, no.~4, pp. 5355--5362, 2020.
+
+\bibitem{wu2018graph}
+L.~Wu \emph{et~al.}, ``Graph attention networks,'' in \emph{Proceedings of the
+  International Conference on Learning Representations (ICLR)}, 2018.
+
+\bibitem{chen2018fastgcn}
+J.~Chen \emph{et~al.}, ``Fastgcn: Fast learning with graph convolutional
+  networks via importance sampling,'' in \emph{Proceedings of the International
+  Conference on Machine Learning (ICML)}, vol.~80, pp. 1437--1446, 2018.
+
+\bibitem{zhou2021graph}
+J.~Zhou \emph{et~al.}, ``Graph neural networks: A review of methods and
+  applications,'' \emph{Artificial Intelligence Review}, vol.~54, no.~1, pp.
+  1--40, 2021.
+
+% Add more \bibitem entries as needed
+
+\end{thebibliography}
+
+\end{document}

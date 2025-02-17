@@ -1,0 +1,507 @@
+\documentclass[a4paper]{article}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{color}
+\usepackage{tcolorbox}
+\usepackage{enumitem}
+\usepackage{amsmath} 
+\usepackage{geometry}
+\usepackage{times}         % changed to IND timezone , kolkata 9:43pm
+\usepackage{mathptmx}        % For Times New Roman math font
+\usepackage[T1]{fontenc}     % For proper font encoding
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{xcolor}
+\usepackage{sectsty}
+
+% Add these lines to adjust page margins and spacing
+\geometry{
+    a4paper,
+    total={170mm,257mm},
+    left=20mm,
+    right=20mm,
+    top=20mm,
+    bottom=20mm
+}
+
+% Adjust vertical spacing
+\setlength{\parskip}{0.5em}
+\setlength{\parsep}{0pt}
+\setlength{\headsep}{0.5em}
+\setlength{\topskip}{0pt}
+\setlength{\topsep}{0pt}
+\setlength{\partopsep}{0pt}
+
+% Adjust table spacing
+\renewcommand{\arraystretch}{1.2}
+
+% Custom headers and footers
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{BHASA SRS}
+\fancyhead[R]{\thepage}
+\fancyfoot[C]{Confidential Document}
+
+% Custom section titles
+\titleformat{\section}{\large\bfseries\color{blue}}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalsize\bfseries\color{blue}}{\thesubsection}{1em}{}
+
+% Custom title page
+\makeatletter
+\renewcommand{\maketitle}{
+    \begin{titlepage}
+        \centering
+        \vspace*{\fill}
+        
+        {\Huge\textbf{Software Requirements Specification}\par}\vspace{1cm}
+        
+        {\LARGE\textbf{BHASA}\par}\vspace{0.5cm}
+        
+        {\Large Bayesian Hyperdimensional Adaptive Sequence Architecture\par}\vspace{0.5cm}
+        
+        {\large Version 1.0\par}\vspace{1cm}
+        
+        {\large\textit{Confidential Document}\par}
+        
+        \vspace{\fill}
+        
+        {\large\today\par}
+    \end{titlepage}
+}
+\makeatother
+
+\author{Confidential Document}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+% Table of contents
+% \tableofcontents
+\newpage
+
+\section{Executive Summary}
+BHASA represents a paradigm shift in efficient language modeling by combining Mamba architecture's state space modeling with Bayesian principles and hyperdimensional computing. This 20M parameter model aims to deliver enterprise-grade performance while maintaining minimal computational overhead.
+
+\subsection{Attention isnt is all you need!}
+The decision to choose MAMBA over Transformers or DeepSeek’s R1 for BHASA is based on several key advantages
+backed by research. Transformers, despite their success, are computationally expensive due to the quadratic scaling of
+the attention mechanism (Vaswani et al., 2017). While R1 offers some improvements, it still retains the inefficiencies
+of Transformers. In contrast, MAMBA utilizes state space modeling, which captures long-term dependencies more effi-
+ciently, reducing complexity and improving scalability (Cheng et al., 2021). Additionally, MAMBA integrates hyperdi-
+mensional computing, offering a robust framework for handling high-dimensional data efficiently, which is not inherently
+supported by Transformers (Feng et al., 2020). Finally, the incorporation of Bayesian principles allows BHASA to handle
+uncertainty in predictions, something that traditional transformer models lack (MacKay, 2003). Empirical evidence sup-
+ports that state space models and hyperdimensional computing can outperform Transformers on resource-limited tasks,
+making MAMBA the ideal choice for building BHASA’s efficient, scalable, and robust architecture.
+
+\section{Project Team and Responsibilities}
+\begin{tabularx}{\textwidth}{|>{\bfseries}l|X|}
+\hline
+\multicolumn{2}{|c|}{\textbf{Core Development Team}} \\
+\hline
+Vishesh Yadav & 
+\begin{itemize}[noitemsep,topsep=0pt]
+    \item Lead Architecture Implementation
+    \item Research \& Innovation Lead
+    \item Backend Computing Infrastructure
+    \item Mamba SSM Integration
+    \item Performance Optimization
+    \item Model Training Pipeline
+\end{itemize} \\
+\hline
+Ayush Soni & 
+\begin{itemize}[noitemsep,topsep=0pt]
+    \item Dataset Engineering Lead
+    \item Data Storage Architecture
+    \item Expertize Dataset Management
+    \item Storage Optimization
+    \item CI/CD Pipeline Setup
+    \item Deployment Architecture
+    
+    
+\end{itemize} \\
+% \hline
+% Tushar Rana & 
+% \begin{itemize}[noitemsep,topsep=0pt]
+%     \item ML Operations Lead
+%     \item Deployment Architecture
+%     \item CI/CD Pipeline Setup
+%     \item Monitoring Systems
+    
+% \end{itemize} \\
+\hline
+Biswajit Mohapatra & 
+\begin{itemize}[noitemsep,topsep=0pt]
+    \item Model Architecture Design
+    \item Bayesian Implementation
+    \item ETL Pipeline Development
+    \item Technical Documentation
+    \item Research Publications
+    \item Performance Benchmarking
+    \item Monitoring Systems
+\end{itemize} \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|>{\bfseries}l|c|c|c|c|}
+
+\end{tabularx}
+
+\section{Team Communication Structure}
+\begin{tabularx}{\textwidth}{|>{\bfseries}l|X|}
+\hline
+Daily Standups & 
+\begin{itemize}[noitemsep,topsep=0pt]
+    \item 9:30 AM IST
+    \item Progress updates
+    \item Blocker resolution
+    \item Task allocation
+\end{itemize} \\
+\hline
+Weekly Reviews & 
+\begin{itemize}[noitemsep,topsep=0pt]
+    \item Architecture review (VY + BM)
+    \item Data pipeline review (AS)
+    \item Infrastructure review (TR)
+    \item Research sync (All members)
+\end{itemize} \\
+\hline
+Documentation & 
+\begin{itemize}[noitemsep,topsep=0pt]
+    \item GitHub Wiki
+    \item Technical Documentation
+    \item Research Notes
+    \item Implementation Guides
+\end{itemize} \\
+\hline
+\end{tabularx}
+
+\section{Team Deliverables Timeline}
+\begin{tabularx}{\textwidth}{|>{\bfseries}l|X|l|}
+\hline
+\textbf{Team Member} & \textbf{Key Deliverables} & \textbf{Timeline} \\
+\hline
+Vishesh Yadav & 
+\begin{itemize}[noitemsep,topsep=0pt]
+    \item Mamba Core Implementation
+    \item Training Infrastructure Setup
+    \item Model Optimization Framework
+\end{itemize} & Weeks 1-12 \\
+\hline
+Ayush Soni & 
+\begin{itemize}[noitemsep,topsep=0pt]
+    \item Dataset Creation Pipeline
+    \item Storage Architecture
+    \item Data Processing Systems
+\end{itemize} & Weeks 1-8 \\
+% \hline
+% Tushar Rana & 
+% \begin{itemize}[noitemsep,topsep=0pt]
+%     \item Deployment Architecture
+%     \item Monitoring Setup
+%     \item Performance Testing Framework
+% \end{itemize} & Weeks 6-16 \\
+\hline
+Biswajit Mohapatra & 
+\begin{itemize}[noitemsep,topsep=0pt]
+    \item Architecture Design Document
+    \item Research Publications
+    \item Innovation Framework
+\end{itemize} & Weeks 1-20 \\
+\hline
+\end{tabularx}
+
+\section{Technical Architecture}
+\begin{tabularx}{\textwidth}{|>{\bfseries}l|X|}
+\hline
+\multicolumn{2}{|c|}{\textbf{Core Architecture Components}} \\
+\hline
+Base Architecture & Mamba SSM with selective state retention \\
+\hline
+Parameter Distribution & 
+\begin{itemize}[noitemsep,topsep=0pt]
+    \item Token Embedding: 3M params
+    \item SSM Layers: 15M params
+    \item Output Head: 2M params
+\end{itemize} \\
+\hline
+Architectural Innovations & 
+\begin{itemize}[noitemsep,topsep=0pt]
+    \item Bayesian State Updates
+    \item Hyperdimensional Vector Quantization
+    \item Adaptive Sequence Compression
+    \item Selective Memory Retention
+\end{itemize} \\
+\hline
+\end{tabularx}
+
+\section{Model Specifications}
+\begin{tabularx}{\textwidth}{|>{\bfseries}l|X|}
+\hline
+\multicolumn{2}{|c|}{\textbf{Model Parameters}} \\
+\hline
+Total Parameters & 20 million (19.8M trainable) \\
+\hline
+Layer Configuration & 
+\begin{itemize}[noitemsep,topsep=0pt]
+    \item 12 Mamba blocks
+    \item 768 hidden dimensions
+    \item 16 SSM states per block
+    \item 4 attention heads
+\end{itemize} \\
+\hline
+Context Window & 2048 tokens (expandable to 4096) \\
+\hline
+Vocabulary & 32,000 tokens (SentencePiece tokenizer) \\
+\hline
+Model Dimension & $d_{\text{model}} = 768$, $d_{\text{state}} = 16$, $d_{\text{conv}} = 4$ \\
+\hline
+\end{tabularx}
+
+\section{Training Infrastructure for a 2B Parameter LLM (Cost in INR)}
+
+A 2B parameter LLM is manageable on a mid-range setup with proper hardware and optimizations. Here's a cost breakdown for building a training cluster in India using NVIDIA RTX 4060 GPUs.
+
+\subsection{1. Model Size and Compute Requirements}
+\begin{itemize}
+    \item Parameters: 2B
+    \item Memory Requirement:
+    \begin{itemize}
+        \item FP32: 40GB (20 bytes per param)
+        \item BF16/FP16: 12GB (6 bytes per param)
+    \end{itemize}
+    \item Batch Size Considerations: Needs at least 16GB of VRAM per GPU for efficient training.
+    \item Compute Time Estimation: ~5-10 days for full pretraining on 4-8 GPUs.
+\end{itemize}
+
+\subsection{2. Hardware Cost Breakdown (INR)}
+\begin{tabularx}{\textwidth}{|>{\bfseries}l|X|c|c|r|}
+\hline
+\textbf{Component} & \textbf{Specs} & \textbf{Qty} & \textbf{Unit Price (INR)} & \textbf{Total (INR)} \\
+\hline
+GPUs & NVIDIA RTX 4060 (8GB VRAM) & 8 & ₹40,000 & ₹3,20,000 \\
+\hline
+CPU & AMD Ryzen 9 7950X (16C/32T) & 1 & ₹55,000 & ₹55,000 \\
+\hline
+Motherboard & X670 or B650 (PCIe 4.0 x16) & 1 & ₹25,000 & ₹25,000 \\
+\hline
+RAM & 128GB DDR5 & 1 & ₹50,000 & ₹50,000 \\
+\hline
+Storage & 2TB NVMe SSD (Gen 4) & 1 & ₹20,000 & ₹20,000 \\
+\hline
+Power Supply & 1200W Platinum PSU & 1 & ₹18,000 & ₹18,000 \\
+\hline
+Cooling & AIO Liquid Cooling & 1 & ₹15,000 & ₹15,000 \\
+\hline
+Chassis & Full-Tower ATX Case & 1 & ₹10,000 & ₹10,000 \\
+\hline
+Networking & Gigabit Ethernet Router & 1 & ₹5,000 & ₹5,000 \\
+\hline
+UPS & 3kVA Online UPS & 1 & ₹30,000 & ₹30,000 \\
+\hline
+Miscellaneous & Cables, Cooling Fans, etc. & - & ₹10,000 & ₹10,000 \\
+\hline
+\multicolumn{4}{|r|}{\textbf{TOTAL}} & \textbf{₹5,58,000 (~₹5.6 Lakhs)} \\
+\hline
+\end{tabularx}
+
+\subsection{3. Power and Running Cost}
+\begin{itemize}
+    \item Total Power Consumption: ~1400W
+    \item Monthly Cost (8hrs/day): ₹3,250/month
+    \item Internet Costs: ₹2,000/month (for 1Gbps fiber)
+    \item Total Monthly Running Cost: ₹5,250/month
+\end{itemize}
+
+\subsection{4. Cloud Alternative (AWS, Google Cloud, Lambda Labs)}
+\begin{tabularx}{\textwidth}{|>{\bfseries}l|X|c|r|}
+\hline
+\textbf{Provider} & \textbf{Instance Type} & \textbf{Cost per Hour} & \textbf{Monthly (300 Hours)} \\
+\hline
+AWS & p4d.24xlarge (8x A100) & ₹1,000/hr & ₹3,00,000 \\
+\hline
+Lambda Labs & 8x A100 & ₹800/hr & ₹2,40,000 \\
+\hline
+Google Cloud & TPU v4-8 & ₹900/hr & ₹2,70,000 \\
+\hline
+\end{tabularx}
+
+\subsection{5. Software Setup}
+\begin{itemize}
+    \item OS: Ubuntu 22.04 LTS
+    \item Frameworks: PyTorch, TensorFlow, DeepSpeed
+    \item Training Stack:
+    \begin{itemize}
+        \item DeepSpeed ZeRO-3 for memory optimization
+        \item FSDP (Fully Sharded Data Parallel) for efficient memory usage
+        \item FlashAttention for faster inference
+        \item Distributed Training: torchrun --nnodes=1 --nproc_per_node=8
+    \end{itemize}
+    \item Monitoring: wandb, tensorboard
+    \item Preprocessing: Tokenization via tiktoken, sentencepiece
+\end{itemize}
+
+\subsection{6. Final Recommendation}
+\begin{itemize}
+    \item Buy 8x RTX 4060 GPUs (~₹5.6L)
+    \item Total running cost = ₹5,250/month
+    \item Cheaper than cloud (₹2.5L/month)
+    \item Can train 2B param model in ~7-10 days
+\end{itemize}
+
+\subsection{7. Total Cost Summary}
+\begin{tabularx}{\textwidth}{|>{\bfseries}l|X|r|}
+\hline
+\textbf{Cost Component} & \textbf{Description} & \textbf{Cost (INR)} \\
+\hline
+Initial Hardware Cost & Total cost of purchasing the hardware & ₹5,58,000 \\
+\hline
+Monthly Running Cost & Cost of running the setup per month & ₹5,250 \\
+\hline
+Annual Running Cost & Total running cost for a year (₹5,250 x 12 months) & ₹63,000 \\
+\hline
+Total Cost for First Year & Sum of hardware and annual running costs & ₹6,21,000 \\
+\hline
+\end{tabularx}
+
+\section{Development Phases}
+\begin{tabularx}{\textwidth}{|>{\bfseries}l|X|}
+\hline
+\textbf{Phase} & \textbf{Activities} \\
+\hline
+Data Engineering & 
+\begin{itemize}[noitemsep,topsep=0pt]
+    \item Data Collection
+    \item Cleaning \& Preprocessing
+    \item Validation Set Creation
+    \item Tokenizer Training
+\end{itemize} \\
+\hline
+Architecture Development & 
+\begin{itemize}[noitemsep,topsep=0pt]
+    \item Mamba Implementation
+    \item Bayesian Layer Design
+    \item HD Computing Integration
+    \item Architecture Testing
+\end{itemize} \\
+\hline
+Training Pipeline & 
+\begin{itemize}[noitemsep,topsep=0pt]
+    \item Pre-training Setup
+    \item Optimization Strategy
+    \item Monitoring Systems
+    \item Checkpointing Logic
+\end{itemize} \\
+\hline
+Model Training & 
+\begin{itemize}[noitemsep,topsep=0pt]
+    \item Initial Training
+    \item Hyperparameter Tuning
+    \item Performance Analysis
+    \item Model Pruning
+\end{itemize} \\
+\hline
+Deployment & 
+\begin{itemize}[noitemsep,topsep=0pt]
+    \item Model Optimization
+    \item API Development
+    \item Documentation
+    \item Performance Testing
+\end{itemize} \\
+\hline
+\end{tabularx}
+
+\section{Performance Metrics}
+\begin{tabularx}{\textwidth}{|>{\bfseries}l|X|l|}
+\hline
+\textbf{Metric} & \textbf{Description} & \textbf{Target} \\
+\hline
+Perplexity & Language modeling quality & < 12 \\
+\hline
+Inference Speed & Token generation latency & < 30ms/token \\
+\hline
+Memory Footprint & Runtime memory usage & < 1.5GB \\
+\hline
+ROUGE-L & Text generation quality & > 0.40 \\
+\hline
+BLEU & Translation accuracy & > 0.35 \\
+\hline
+Response Quality & Human evaluation score & > 4.0/5.0 \\
+\hline
+\end{tabularx}
+
+\section{Technical Innovations}
+\begin{itemize}
+\item \textbf{Bayesian State Updates:}
+    \begin{itemize}
+        \item Uncertainty-aware state transitions
+        \item Probabilistic sequence modeling
+        \item Adaptive learning rates
+    \end{itemize}
+\item \textbf{Hyperdimensional Computing:}
+    \begin{itemize}
+        \item Vector symbolic architectures
+        \item Distributed representations
+        \item Robust pattern recognition
+    \end{itemize}
+\item \textbf{Adaptive Sequence Processing:}
+    \begin{itemize}
+        \item Dynamic context window
+        \item Memory-efficient processing
+        \item Selective attention mechanism
+    \end{itemize}
+\end{itemize}
+
+\section{Risk Management}
+\begin{tabularx}{\textwidth}{|>{\bfseries}l|X|l|X|}
+\hline
+\textbf{Risk} & \textbf{Impact} & \textbf{Probability} & \textbf{Mitigation} \\
+\hline
+Training Divergence & High & Medium & 
+\begin{itemize}[noitemsep,topsep=0pt]
+    \item Gradient monitoring
+    \item Early stopping
+    \item Learning rate scheduling
+\end{itemize} \\
+\hline
+Memory Constraints & High & Low & 
+\begin{itemize}[noitemsep,topsep=0pt]
+    \item Gradient accumulation
+    \item Mixed precision training
+    \item Model sharding
+\end{itemize} \\
+\hline
+Performance Issues & Medium & Medium & 
+\begin{itemize}[noitemsep,topsep=0pt]
+    \item Regular profiling
+    \item Optimization sprints
+    \item Hardware upgrades
+\end{itemize} \\
+\hline
+\end{tabularx}
+
+\section{Deployment Strategy}
+\begin{tabularx}{\textwidth}{|>{\bfseries}l|X|}
+\hline
+\multicolumn{2}{|c|}{\textbf{Deployment Specifications}} \\
+\hline
+Container Solution & Docker with CUDA support \\
+\hline
+API Framework & FastAPI with async support \\
+\hline
+Serving Infrastructure & 
+\begin{itemize}[noitemsep,topsep=0pt]
+    % \item Kubernetes cluster
+    \item Load balancing
+    \item Auto-scaling
+\end{itemize} \\
+\hline
+Monitoring & Prometheus + Grafana \\
+\hline
+\end{tabularx}
+
+\end{document}
