@@ -18,9 +18,10 @@ class TextGenerationRequest(BaseModel):
 
 @app.post("/generate")
 def generate(request: TextGenerationRequest):
+    start_text = request.start_text
     generated_text = generate_text(
         model, 
-        request.start_text, 
+        start_text,
         request.length, 
         dataset, 
         hidden_size=128, 
