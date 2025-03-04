@@ -8,6 +8,7 @@ import json
 import requests
 import io
 import gzip
+import time
 
 # Modified TextDataset class for HelpSteer2 data
 class HelpSteer2Dataset(Dataset):
@@ -85,12 +86,11 @@ def load_helpsteer2_data():
         raise
 
 # Modified training setup
-def train_model(dataset, seq_length=50, hidden_size=128, num_layers=1, epochs=1, model_path='mamba_model.pth', batch_size=32, resume=True):
+def train_model(dataset, seq_length=50, hidden_size=128, num_layers=1, epochs=1, model_path='mamba_helpsteer555.pth', batch_size=32, resume=True):
     # Create dataset instance
     train_dataset = HelpSteer2Dataset(dataset, seq_length)
     dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
     
-    # Check if GPU is available and use it
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Using device: {device}")
     
@@ -100,76 +100,137 @@ def train_model(dataset, seq_length=50, hidden_size=128, num_layers=1, epochs=1,
     criterion = nn.CrossEntropyLoss()
 
     start_epoch = 0
+    best_loss = float('inf')
+    training_stats = {
+        'epochs': [],
+        'losses': [],
+        'best_loss': float('inf'),
+        'time_elapsed': 0
+    }
 
-    # Load from checkpoint if resume is True
+    # Load checkpoint if resuming
     if resume:
         try:
+            print(f"Loading checkpoint from {model_path}")
             checkpoint = torch.load(model_path)
-            model.load_state_dict(checkpoint['model_state_dict'])
-            # Check if 'optimizer_state_dict' exists in the checkpoint
-            if 'optimizer_state_dict' in checkpoint:
-                optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+            
+            # Handle different checkpoint formats
+            if isinstance(checkpoint, dict):
+                # New checkpoint format
+                if 'model_state_dict' in checkpoint:
+                    model.load_state_dict(checkpoint['model_state_dict'])
+                    if 'optimizer_state_dict' in checkpoint:
+                        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+                    start_epoch = checkpoint.get('epoch', 0)
+                    best_loss = checkpoint.get('best_loss', float('inf'))
+                    training_stats = checkpoint.get('training_stats', training_stats)
+                else:
+                    # Old format or different structure
+                    model.load_state_dict(checkpoint)
             else:
-                print("Optimizer state not found in checkpoint. Starting with a new optimizer.")
-            start_epoch = checkpoint.get('epoch', 0) + 1
-            print(f"Resuming training from epoch {start_epoch}")
-        except FileNotFoundError:
-            print(f"Checkpoint file {model_path} not found. Starting from scratch.")
-        except KeyError as e:
-            print(f"KeyError: {e}. Some state information is missing in the checkpoint. Starting from scratch.")
+                # Direct state dict
+                model.load_state_dict(checkpoint)
+                
+            print(f"Resuming from epoch {start_epoch} with best loss: {best_loss:.4f}")
+            
+        except Exception as e:
+            print(f"Error loading checkpoint: {e}")
+            print("Starting training from scratch")
+            start_epoch = 0
+            best_loss = float('inf')
 
     print(f"Starting training with vocabulary size: {len(train_dataset.chars)}")
     
+    start_time = time.time()
     try:
         for epoch in range(start_epoch, epochs):
+            epoch_start_time = time.time()
             total_loss = 0
+            batch_count = 0
+            
             for batch_idx, (inputs, targets) in enumerate(dataloader):
                 inputs, targets = inputs.to(device), targets.to(device)
                 inputs = nn.functional.one_hot(inputs, num_classes=len(train_dataset.chars)).float().to(device)
                 
-                # Initialize hidden state
                 batch_size = inputs.size(0)
                 hidden = (torch.zeros(num_layers, batch_size, hidden_size).to(device),
                          torch.zeros(num_layers, batch_size, hidden_size).to(device))
                 
-                # Forward pass
                 outputs, hidden = model(inputs, hidden)
                 loss = criterion(outputs.view(-1, len(train_dataset.chars)), targets.view(-1))
                 
-                # Backward pass
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
                 
                 total_loss += loss.item()
+                batch_count += 1
                 
                 if batch_idx % 10 == 0:
-                    print(f'Epoch {epoch+1}, Batch {batch_idx}, Loss: {loss.item():.4f}')
+                    avg_loss = total_loss / (batch_idx + 1)
+                    elapsed = time.time() - epoch_start_time
+                    print(f'Epoch {epoch+1}, Batch {batch_idx}, Loss: {loss.item():.4f}, Avg Loss: {avg_loss:.4f}, Time: {elapsed:.2f}s')
             
-            avg_loss = total_loss / len(dataloader)
-            print(f'Epoch {epoch+1}, Average Loss: {avg_loss:.4f}')
+            avg_epoch_loss = total_loss / batch_count
+            epoch_time = time.time() - epoch_start_time
+            total_time = time.time() - start_time
+            
+            # Update training stats
+            training_stats['epochs'].append(epoch + 1)
+            training_stats['losses'].append(avg_epoch_loss)
+            training_stats['time_elapsed'] = total_time
+            
+            if avg_epoch_loss < best_loss:
+                best_loss = avg_epoch_loss
+                training_stats['best_loss'] = best_loss
+            
+            print(f'Epoch {epoch+1} completed in {epoch_time:.2f}s')
+            print(f'Average Loss: {avg_epoch_loss:.4f}, Best Loss: {best_loss:.4f}')
             
             # Save checkpoint after each epoch
             checkpoint = {
-                'epoch': epoch,
+                'epoch': epoch + 1,
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
-                'loss': avg_loss,
-                'vocab': train_dataset.chars
+                'loss': avg_epoch_loss,
+                'best_loss': best_loss,
+                'vocab': train_dataset.chars,
+                'training_stats': training_stats,
+                'timestamp': time.strftime('%Y-%m-%d %H:%M:%S')
             }
-            torch.save(checkpoint, f'{model_path}.epoch{epoch+1}')
-            print(f'Checkpoint saved: {model_path}.epoch{epoch+1}')
+            
+            # Save both latest and best checkpoints
+            torch.save(checkpoint, f'{model_path}.latest')
+            print(f'Latest checkpoint saved: {model_path}.latest')
+            
+            if avg_epoch_loss == best_loss:
+                torch.save(checkpoint, f'{model_path}.best')
+                print(f'Best checkpoint saved: {model_path}.best')
+            
+            # Save periodic checkpoint every 5 epochs
+            if (epoch + 1) % 5 == 0:
+                torch.save(checkpoint, f'{model_path}.epoch{epoch+1}')
+                print(f'Periodic checkpoint saved: {model_path}.epoch{epoch+1}')
 
     except KeyboardInterrupt:
-        print("\nTraining interrupted. Saving final model weights...")
-    
+        print("\nTraining interrupted. Saving checkpoint...")
+        
     finally:
-        # Save the final model weights
-        torch.save({
+        final_time = time.time() - start_time
+        print(f"\nTraining completed in {final_time:.2f} seconds")
+        print(f"Best loss achieved: {best_loss:.4f}")
+        
+        # Save final checkpoint
+        final_checkpoint = {
             'model_state_dict': model.state_dict(),
-            'vocab': train_dataset.chars
-        }, model_path)
+            'vocab': train_dataset.chars,
+            'training_stats': training_stats,
+            'final_loss': best_loss,
+            'timestamp': time.strftime('%Y-%m-%d %H:%M:%S')
+        }
+        torch.save(final_checkpoint, model_path)
         print(f'Final model saved to {model_path}')
+        
         return model, train_dataset
 
 def load_model(vocab_size, hidden_size, num_layers, model_path='mamba_helpsteer2.pth'):
@@ -266,9 +327,9 @@ if __name__ == '__main__':
         'seq_length': 100,
         'hidden_size': 256,
         'num_layers': 2,
-        'epochs': 1,
+        'epochs': 50,
         'batch_size': 32,
-        'model_path': 'mamba_helpsteer2.pth'
+        'model_path': 'mamba_helpsteer555.pth'
     }
     
     print("Starting training with parameters:", params)

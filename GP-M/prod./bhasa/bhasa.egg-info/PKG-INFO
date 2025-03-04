@@ -1,0 +1,22 @@
+Metadata-Version: 2.1
+Name: bhasa
+Version: 0.1.1
+Summary: A short description of your library
+Home-page: https://github.com/vishesh9131/BHASA_lab.git
+Author: Vishesh Yadav and Team
+Author-email: sciencely98@gmail.com
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: causal_conv1d==1.5.0.post8
+Requires-Dist: einops==0.8.1
+Requires-Dist: flash_attn==2.7.4.post1
+Requires-Dist: huggingface_hub==0.22.2
+Requires-Dist: packaging==24.2
+Requires-Dist: transformers==4.39.3
+
+# Test Phase 
+nothing much its just for lab
