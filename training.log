@@ -1,0 +1,38 @@
+🚀 Starting BHASA Mamba training...
+🍎 Using Apple Silicon MPS acceleration
+📚 Loading training data...
+📖 Loading existing data.txt
+📊 Loaded 1115393 characters
+🔤 Vocabulary size: 65
+🧠 Model parameters: 15,672,832
+🎯 Training for 50 epochs...
+Epoch 1/50:   0%|          | 0/2179 [00:00<?, ?it/s]Epoch 1/50:   0%|          | 0/2179 [00:00<?, ?it/s]
+Traceback (most recent call last):
+  File "/Users/visheshyadav/Documents/GitHub/BHASA_lab/bhasa_mamba.py", line 656, in <module>
+    train_bhasa_mamba() 
+    ^^^^^^^^^^^^^^^^^^^
+  File "/Users/visheshyadav/Documents/GitHub/BHASA_lab/bhasa_mamba.py", line 594, in train_bhasa_mamba
+    logits, loss = model(input_ids, targets)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1501, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/visheshyadav/Documents/GitHub/BHASA_lab/bhasa_mamba.py", line 290, in forward
+    x = layer(x)
+        ^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1501, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/visheshyadav/Documents/GitHub/BHASA_lab/bhasa_mamba.py", line 206, in forward
+    x = self.ssm(x)
+        ^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1501, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/visheshyadav/Documents/GitHub/BHASA_lab/bhasa_mamba.py", line 120, in forward
+    y = self.selective_scan(x_conv, dt, A, B, C)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/visheshyadav/Documents/GitHub/BHASA_lab/bhasa_mamba.py", line 150, in selective_scan
+    B_discrete = dt_u.unsqueeze(-1) * B.transpose(1, 2).unsqueeze(1)  # (batch, d_model, seq_len, d_state)
+                 ~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+RuntimeError: The size of tensor a (256) must match the size of tensor b (32) at non-singleton dimension 2
